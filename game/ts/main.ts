@@ -1,6 +1,6 @@
-import { Ball } from "./classBall";
-import { Paddle } from "./classPaddle";
-import { checkPaddleCollision } from "./collisions";
+import { Ball } from "./classBall.js";
+import { Paddle } from "./classPaddle.js";
+import { checkPaddleCollision } from "./collisions.js";
 
 const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;

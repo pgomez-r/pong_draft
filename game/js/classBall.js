@@ -2,8 +2,8 @@ export class Ball {
     constructor() {
         this.xPos = 400;
         this.yPos = 250;
-        this.xVel = 4;
-        this.yVel = 4;
+        this.xVel = 5;
+        this.yVel = 5;
         this.radius = 10;
     }
     update(canvas) {

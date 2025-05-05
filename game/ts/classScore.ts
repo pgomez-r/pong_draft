@@ -1,0 +1,45 @@
+
+export class    ScoreManager{
+	private scores : Record<string, number>;
+	private scoreDisplay : HTMLElement;
+
+	constructor(playerIds : string[]){
+		this.scores = {};
+		playerIds.forEach(id => this.scores[id] = 0);
+		this.scoreDisplay = this.createScoreDisplay();
+	}
+
+	private createScoreDisplay() : HTMLElement {
+		const display = document.createElement('div');
+		display.style.position = 'absolute';
+		display.style.top = '20px';
+		display.style.left = '50%';
+		display.style.transform = 'translateX(-50%)';
+		display.style.color = 'white';
+		display.style.fontFamily = 'Arial, sans-serif';
+		display.style.fontSize = '24px';
+		document.body.appendChild(display);
+		return (display);
+	}
+
+	public	increment(playerId : string) : void {
+		if (this.scores.hasOwnProperty(playerId)) {
+			this.scores[playerId]++;
+			this.updateDisplay();
+		}
+	  }
+	
+	public getScore(playerId : string) : number {
+		return (this.scores[playerId]);
+	}
+
+	public getAllScores() : Record<string, number> {
+		return ({...this.scores});
+	}
+
+	private updateDisplay() : void{
+		this.scoreDisplay.textContent = Object.entries(this.scores)
+			.map(([id, score]) => `${id}: ${score}`)
+			.join(' | ');
+	}
+}

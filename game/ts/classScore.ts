@@ -1,5 +1,9 @@
 
-export class    ScoreManager{
+/**
+ * Brief: ScoreManager class will store both player scores using a Record type variable
+ * 	(?) Record is a container like a map but limited to simple types of variables (strings, numbers)
+ */
+export class	ScoreManager{
 	private scores : Record<string, number>;
 	private scoreDisplay : HTMLElement;
 
@@ -42,4 +46,5 @@ export class    ScoreManager{
 			.map(([id, score]) => `${id}: ${score}`)
 			.join(' | ');
 	}
+	// If this.scores is NULL? May need to protect that case, although it should be at least 0 when created
 }

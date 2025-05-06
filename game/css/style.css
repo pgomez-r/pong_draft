@@ -9,4 +9,15 @@ body {
 
 #gameCanvas {
 	border: 2px solid white;
+	background:
+		/* Dashed vertical center line */
+		repeating-linear-gradient(
+			to bottom,
+			white 0,
+			white 10px,
+			transparent 10px,
+			transparent 20px
+		) center/2px 100% no-repeat,
+		/* Solid black background */
+		black;
 }

@@ -33,11 +33,23 @@ export class Ball
 		ctx.fill();
 	}
 
-	public checkScore(canvas : HTMLCanvasElement) : { scorer?: string, side?: 'left' | 'right' } {
+	public checkScore(canvas : HTMLCanvasElement) : { scoreSide?: 'left' | 'right' } {
 		if (this.xPos <= -this.radius)
-			return { side: 'left' };
+			return { scoreSide: 'right' };
 		if (this.xPos >= canvas.width + this.radius)
-			return { side: 'right' };
+			return { scoreSide: 'left' };
 		return {};
 	  }
+
+	public reset(canvas: HTMLCanvasElement, sideDir: string) : void {
+		this.xPos = canvas.width / 2;
+		this.yPos = canvas.height / 2;
+		this.yVel = (Math.random() * 2 - 1) * 3;
+		if (sideDir === 'left')
+			this.xVel = 5;
+		else if (sideDir === 'right')
+			this.xVel = -5;
+		else
+			this.xVel = (Math.random() > 0.5 ? 1 : -1) * 5;
+	}
 }

@@ -11,6 +11,7 @@ export class	ScoreManager{
 		this.scores = {};
 		playerIds.forEach(id => this.scores[id] = 0);
 		this.scoreDisplay = this.createScoreDisplay();
+		this.updateDisplay();
 	}
 
 	private createScoreDisplay() : HTMLElement {
@@ -47,4 +48,14 @@ export class	ScoreManager{
 			.join(' | ');
 	}
 	// If this.scores is NULL? May need to protect that case, although it should be at least 0 when created
+	
+	// Draw function to display scores on canvas - alternative to HTML DOM update display function
+	public draw(ctx: CanvasRenderingContext2D) : void
+	{
+		ctx.fillStyle = 'white';
+		ctx.font = '24px Arial';
+		Object.entries(this.scores).forEach(([id, score], index) => {
+		  ctx.fillText(`${id}: ${score}`, 20, 40 + (30 * index));
+		});
+	}
 }

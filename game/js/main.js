@@ -44,6 +44,18 @@ function updateAI() {
     else
         aiPaddle.yVel = 0;
 }
+// Function to draw the dashed center line - designed by AI, need to understand better
+function drawCenterLine(ctx, canvas) {
+    const centerX = canvas.width / 2;
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([10, 10]);
+    ctx.beginPath();
+    ctx.moveTo(centerX, 0);
+    ctx.lineTo(centerX, canvas.height);
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
 // Function to be called by the script, which will be a loop (or loop-hook as in MLX)
 // Same idea of MLX in cub3D: clears - calculates - draws with updated values each "frame" on loop
 // Loop is guaranteed by "requestAnimationFrame", it schedules the next execution of gameLoop 
@@ -52,6 +64,8 @@ function gameLoop() {
     // Clear
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Draw the center line
+    drawCenterLine(ctx, canvas);
     // Update objects values - positions
     ball.update(canvas);
     playerPaddle.update(canvas);

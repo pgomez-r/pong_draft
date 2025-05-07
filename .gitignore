@@ -1,0 +1,5 @@
+# Ignore the js folder and its contents
+game/js/
+
+# Ignore the node_modules directory and its contents
+game/node_modules/

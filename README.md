@@ -8,8 +8,6 @@ Isolated test implementation of a basic pong game.
 
 - Git
 - Node.js and npm (Node Package Manager)
-- Visual Studio Code
-- Live Server extension for VSCode
 
 ### Setup and Running Instructions
 
@@ -27,25 +25,26 @@ Isolated test implementation of a basic pong game.
    npm install
    ```
 
-3. **Compile TypeScript to JavaScript**
+3. **Build and run game**
 
    - For a one-time build:
-     ```bash
-     npm run build
-     ```
+	 ```bash
+	 npm run build
+	 ```
    - For continuous compilation (watches for changes):
-     ```bash
-     npm run watch
-     ```
-
-4. **Run the game**
-   - Open the project in Visual Studio Code
-   - Navigate to `game/public/index.html`
-   - Right-click on the file and select "Open with Live Server" (or use the shortcut Alt+L Alt+O)
-   - Alternatively, from the Command Palette (Ctrl+Shift+P), search for "Live Server: Open with Live Server"
-> Depending on your Live Server configuration, you may first see the project folder tree on browser, then you will have to navigate to game/public/index.html to view the actual game
+	 ```bash
+	 npm run watch
+	 ```
+   - To just start the server and display page without watching for changes:
+	 ```bash
+	 npm run serve
+	 ```
+   - For continuous development and display:
+	 ```bash
+	 npm run dev
+	 ```
 
 ### Troubleshooting
-- Make sure you have the Live Server extension installed in VS Code
-- If you make changes to TypeScript files, ensure the compiler is running (npm run watch) to see updates and reload page on browser as well
+- If the browser doesn't open automatically, navigate to http://localhost:5050/public/index.html or just http://localhost:5050
+- If you make changes to TypeScript files while watch or dev scripts are running, they will be automatically compiled. Even so, you may need to refresh your browser to see the updates.
 

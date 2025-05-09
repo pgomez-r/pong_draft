@@ -16,6 +16,8 @@ export class	ScoreManager{
 
 	private createScoreDisplay() : HTMLElement {
 		const display = document.createElement('div');
+		display.id = 'score-board';
+		display.className = 'score-board';
 		display.style.position = 'absolute';
 		display.style.top = '20px';
 		display.style.left = '50%';

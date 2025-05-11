@@ -1,6 +1,6 @@
 import { GameConfig, GameState } from '../shared/types';
-import { setupInput } from './input';
-import { setupRenderer } from './renderer';
+import { setupInput } from './input.js';
+import { setupRenderer } from './renderer.js';
 
 class PongClient
 {
@@ -18,12 +18,27 @@ class PongClient
 
 	private initConnection()
 	{
-		this.ws = new WebSocket('ws://localhost:5050/game'); // Adjust the URL:port as needed
+		// Correct WebSocket URL based on your environment
+		const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+		const host = window.location.hostname;
+		const port = window.location.port || (protocol === 'wss:' ? 443 : 80);
+		const wsUrl = `${protocol}//${host}:${port}/game`;
+		this.ws = new WebSocket(wsUrl);
+    
 		this.ws.onopen = () => {
+			console.log('WebSocket connection established');
 			this.ws?.send(JSON.stringify({
-			type: 'INIT',
-			config: this.config
+				type: 'INIT',
+				config: this.config
 			}));
+		};
+
+		this.ws.onerror = (error) => {
+			console.error('WebSocket error:', error);
+		};
+
+		this.ws.onclose = (event) => {
+			console.log('WebSocket connection closed:', event.code, event.reason);
 		};
 
 		this.ws.onmessage = (event) => {

@@ -38,3 +38,9 @@ export interface PlayerInput {
 	down: boolean;
 	player: 'player1' | 'player2';
 }
+
+export type WebSocketMessage = 
+	| { type: 'INIT'; config: GameConfig }
+	| { type: 'PLAYER_INPUT'; input: PlayerInput }
+	| { type: 'INIT_RESPONSE'; playerNumber: 'player1' | 'player2' | null }
+	| { type: 'GAME_STATE'; state: GameState };

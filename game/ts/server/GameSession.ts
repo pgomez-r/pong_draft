@@ -1,5 +1,5 @@
 
-import { GameConfig, GameState, PlayerInput } from '../shared/types';
+import { GameConfig, GameState, PlayerInput } from '../shared/types.js';
 
 export class GameSession
 {
@@ -189,5 +189,10 @@ export class GameSession
 	public getState(): GameState
 	{
 		return (this.state);
+	}
+
+	public getConfig(): GameConfig
+	{
+		return (this.config);
 	}
 }

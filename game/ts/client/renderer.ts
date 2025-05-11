@@ -1,4 +1,4 @@
-import { GameConfig, GameState } from '../shared/types';
+import { GameConfig, GameState } from '../shared/types.js';
 
 export function setupRenderer(getState: () => GameState | null, config: GameConfig)
 {

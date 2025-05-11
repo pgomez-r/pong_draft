@@ -1,73 +1,96 @@
-import { FastifyInstance } from 'fastify';
-import { GameConfig } from '../shared/types';
-import { GameSession } from './GameSession';
-import websocketPlugin from '@fastify/websocket';
+import { FastifyInstance, FastifyRequest } from 'fastify';
+import { GameConfig, PlayerInput, GameState } from '../shared/types.js';
+import { GameSession } from './GameSession.js';
 
-// TODO: Encapsulate 'INIT' and 'PLAYER_INPUT' in aux functions for better readability
-export function setupGameRoutes(fastify: FastifyInstance)
-{
-	let gameSession: GameSession | null = null;
-	const clients = new Set<WebSocket>();
-	fastify.get('/game', { websocket: true }, (connection, req) => {
-		clients.add(connection.socket);
-		connection.socket.on('message', (message) => {
-			const data = JSON.parse(message.toString());
-			if (data.type === 'INIT')
-			{
-				// Initialize game if not already done
-				if (!gameSession)
-				{
-					gameSession = new GameSession(data.config as GameConfig);
-					// Start game loop
-					setInterval(() => {
-						if (!gameSession)
-							return;
-						const now = Date.now();
-						const deltaTime = (now - lastUpdateTime) / 1000; // Convert to seconds
-						lastUpdateTime = now;
-						gameSession.update(deltaTime);
-						// Broadcast state to all clients
-						const state = gameSession.getState();
-						clients.forEach(client => {
-							if (client.readyState === client.OPEN)
-							{
-								client.send(JSON.stringify({
-									type: 'GAME_STATE',
-									state
-								}));
-							}		
-						});
-					}, 16); // ~60fps
-					let lastUpdateTime = Date.now();
-				}
+// Define WebSocket handler interface
+interface WebSocketHandler {
+    (connection: WebSocket, request: FastifyRequest): void;
+}
 
-				// Assign player number based on game mode
-				let playerNumber: 'player1' | 'player2' | null = null;
-				
-				if (gameSession)
-				{
-					const config = gameSession.getState(); // Not state, but config!
-					if (config.gameMode === '1vAI')
-						playerNumber = 'player1';
-					else // For multiplayer, assign first as player1, second as player2
-						playerNumber = clients.size === 1 ? 'player1' : 'player2';
-				}
+// Augment Fastify types to include WebSocket
+declare module 'fastify' {
+    interface FastifyInstance {
+        websocketServer: any;
+    }
+}
 
-				connection.socket.send(JSON.stringify({
-					type: 'INIT_RESPONSE',
-					playerNumber
-				}));
-			}
-			else if (data.type === 'PLAYER_INPUT' && gameSession)
-			{
-				gameSession.setPlayerInput(data.input);
-			}
-		});
+export function setupGameRoutes(server: FastifyInstance) {
+    let gameSession: GameSession | null = null;
+    const clients = new Set<WebSocket>();
 
-		connection.socket.on('close', () => {
-			clients.delete(connection.socket);
-			if (clients.size === 0)
-				gameSession = null;
-		});
-	});
-}	
+    server.get('/game', { websocket: true }, (connection, req) => {
+        // TypeScript now recognizes this as a WebSocket connection
+        const socket = connection as unknown as WebSocket;
+        clients.add(socket);
+
+        const messageHandler = (event: MessageEvent) => {
+            try {
+                const data = JSON.parse(event.data.toString());
+
+                if (data.type === 'INIT') {
+                    if (!gameSession) {
+                        gameSession = new GameSession(data.config as GameConfig);
+                        
+                        let lastUpdateTime = Date.now();
+                        const gameLoop = setInterval(() => {
+                            if (!gameSession) {
+                                clearInterval(gameLoop);
+                                return;
+                            }
+                            
+                            const now = Date.now();
+                            const deltaTime = (now - lastUpdateTime) / 1000;
+                            lastUpdateTime = now;
+                            
+                            gameSession.update(deltaTime);
+                            
+                            const state = gameSession.getState();
+                            clients.forEach(client => {
+                                if (client.readyState === client.OPEN) {
+                                    client.send(JSON.stringify({
+                                        type: 'GAME_STATE',
+                                        state
+                                    }));
+                                }
+                            });
+                        }, 16);
+                    }
+
+                    let playerNumber: 'player1' | 'player2' | null = null;
+                    if (gameSession) {
+                        const config = gameSession.getConfig();
+                        playerNumber = config.gameMode === '1vAI' 
+                            ? 'player1' 
+                            : clients.size === 1 ? 'player1' : 'player2';
+                    }
+
+                    socket.send(JSON.stringify({
+                        type: 'INIT_RESPONSE',
+                        playerNumber
+                    }));
+                } else if (data.type === 'PLAYER_INPUT' && gameSession) {
+                    gameSession.setPlayerInput(data.input as PlayerInput);
+                }
+            } catch (error) {
+                console.error('Error processing message:', error);
+            }
+        };
+
+        const closeHandler = () => {
+            clients.delete(socket);
+            if (clients.size === 0) {
+                gameSession = null;
+            }
+        };
+
+        // Proper WebSocket event handlers
+        socket.addEventListener('message', messageHandler);
+        socket.addEventListener('close', closeHandler);
+
+        // Cleanup on connection close
+        socket.addEventListener('close', () => {
+            socket.removeEventListener('message', messageHandler);
+            socket.removeEventListener('close', closeHandler);
+        });
+    });
+}

@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import { GameConfig, PlayerInput, GameState } from '../shared/types.js';
 import { GameSession } from './GameSession.js';
+import { WebSocket } from 'ws';
 
 // Define WebSocket handler interface
 interface WebSocketHandler {
@@ -19,7 +20,6 @@ export function setupGameRoutes(server: FastifyInstance) {
     const clients = new Set<WebSocket>();
 
     server.get('/game', { websocket: true }, (connection, req) => {
-        // TypeScript now recognizes this as a WebSocket connection
         const socket = connection as unknown as WebSocket;
         clients.add(socket);
 
@@ -84,13 +84,13 @@ export function setupGameRoutes(server: FastifyInstance) {
         };
 
         // Proper WebSocket event handlers
-        socket.addEventListener('message', messageHandler);
-        socket.addEventListener('close', closeHandler);
+        socket.on('message', messageHandler);
+        socket.on('close', closeHandler);
 
         // Cleanup on connection close
-        socket.addEventListener('close', () => {
-            socket.removeEventListener('message', messageHandler);
-            socket.removeEventListener('close', closeHandler);
+        socket.on('close', () => {
+            socket.off('message', messageHandler);
+            socket.off('close', closeHandler);
         });
     });
 }

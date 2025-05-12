@@ -21,8 +21,9 @@ class PongClient
 		// Correct WebSocket URL based on your environment
 		const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 		const host = window.location.hostname;
-		const port = window.location.port || (protocol === 'wss:' ? 443 : 80);
+		const port = 5051;
 		const wsUrl = `${protocol}//${host}:${port}/game`;
+		console.log('Connecting to:', wsUrl);
 		this.ws = new WebSocket(wsUrl);
     
 		this.ws.onopen = () => {

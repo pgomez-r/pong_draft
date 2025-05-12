@@ -1,8 +1,9 @@
 import fastify from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
+import fastifyCors from '@fastify/cors';
 import { setupGameRoutes } from './api.js';
 
-const currentPort = 5050;
+const currentPort = 5051;
 const server = fastify({ 
     logger: true,
     forceCloseConnections: true,
@@ -16,15 +17,21 @@ server.register(fastifyWebsocket, {
     }
 });
 
+// Add CORS if needed (common during development)
+server.register(fastifyCors, {
+    origin: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+    allowedHeaders: ['Sec-WebSocket-Protocol', 'Sec-WebSocket-Version', 'Sec-WebSocket-Extensions', 'Sec-WebSocket-Key']
+});
+
+// Root route
+server.get('/', async (request, reply) => {
+    return { message: 'Pong game server is running' };
+});
+
 // Setup routes
 setupGameRoutes(server);
-
-// Add CORS if needed (common during development)
-server.register(require('@fastify/cors'), {
-    origin: true, // Allows all origins
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
-});
 
 const start = async () => {
     try {
